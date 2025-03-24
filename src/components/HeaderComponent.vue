@@ -13,37 +13,30 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { UserPermission, UserInfo } from "@/types/userInfo";
-import { defineComponent, computed, onBeforeUpdate } from "vue";
+import { defineEmits, defineProps, onBeforeUpdate, computed } from "vue";
 
-export default defineComponent({
-  props: {
-    userInfo: {
-      type: Object as () => UserInfo,
-      required: true,
-    },
-  },
-  emits: ["logout"],
-  setup(props, { emit }) {
-    const isLogin = computed(
-      () =>
-        props.userInfo.userName !== "" && props.userInfo.userName !== undefined
-    );
-    const canManage = computed(
-      () => props.userInfo.userPermission === UserPermission.ADMIN
-    );
+const props = defineProps<{
+  userInfo: UserInfo;
+}>();
 
-    const logout = () => {
-      const userInfo = {} as UserInfo;
-      emit("logout", userInfo);
-    };
+const emits = defineEmits(["logout"]);
 
-    onBeforeUpdate(() => {
-      console.log("User Log out");
-    });
-    return { isLogin, canManage, logout };
-  },
+const isLogin = computed(
+  () => props.userInfo.userName !== "" && props.userInfo.userName !== undefined
+);
+const canManage = computed(
+  () => props.userInfo.userPermission === UserPermission.ADMIN
+);
+
+const logout = () => {
+  const userInfo = {} as UserInfo;
+  emits("logout", userInfo);
+};
+
+onBeforeUpdate(() => {
+  console.log("User Log out");
 });
 </script>
 

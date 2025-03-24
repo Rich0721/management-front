@@ -7,27 +7,20 @@
   </div>
 </template>
 
-<script>
-import { defineComponent, ref } from "vue";
-import { UserPermission, UserInfo } from "@/types/userInfo";
+<script setup lang="ts">
+import { defineEmits, ref } from "vue";
+import { UserPermission } from "@/types/userInfo";
 
-export default defineComponent({
-  emits: ["login"],
-  setup(_, { emit }) {
-    const account = ref("");
-    const password = ref("");
-
-    const login = () => {
-      const userInfo = {
-        userName: account.value,
-        userPermission: UserPermission.ADMIN,
-      };
-      emit("login", userInfo);
-    };
-
-    return { account, password, login };
-  },
-});
+const emits = defineEmits(["login"]);
+const account = ref("");
+const password = ref("");
+const login = () => {
+  const userInfo = {
+    userName: account.value,
+    userPermission: UserPermission.ADMIN,
+  };
+  emits("login", userInfo);
+};
 </script>
 
 <style lang="scss" scoped>
