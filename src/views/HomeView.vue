@@ -1,6 +1,6 @@
 <template>
   <HeaderComponent :userInfo="testUser" @logout="handleLog" />
-  <LogComponent v-show="LogComponentShow" @login="handleLog" />
+  <!--<LogComponent v-show="LogComponentShow" @login="handleLog" />
   <ManageProductComponent
     v-show="!LogComponentShow"
     v-for="index in 5"
@@ -9,13 +9,17 @@
     title="Product Title"
     date="2021-10-01"
     description="Product Description"
-  />
+  />-->
+
+  <EditProductComponent />
 </template>
 
 <script setup lang="ts">
 import HeaderComponent from "@/components/HeaderComponent.vue";
 import LogComponent from "@/components/LogComponent.vue";
 import ManageProductComponent from "@/components/ManageProductComponent.vue";
+import EditProductComponent from "@/components/EditProductComponent.vue";
+
 import { UserInfo } from "@/types/userInfo";
 import { ref, onBeforeUpdate } from "vue";
 

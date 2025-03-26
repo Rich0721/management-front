@@ -1,36 +1,33 @@
 <template>
   <button
     class="button"
-    :style="buttonStyle"
+    :style="flux.buttonStyle"
     @click="onClick"
-    @mouseover="applyHoverColor"
-    @mouseleave="removeHoverColor"
+    @mouseover="flux.applyHoverColor()"
+    @mouseleave="flux.removeHoverColor"
   >
     <slot></slot>
   </button>
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref } from "vue";
+import { defineProps, reactive, ref } from "vue";
+import { PropsButtonComponent } from "@/types/PropsButtonComponent";
 
-const props = defineProps<{
-  onClick: () => void;
-  backgroundColor?: string;
-  hoverColor?: string;
-}>();
+const props = defineProps<PropsButtonComponent>();
 
-const buttonStyle = ref({
-  backgroundColor: props.backgroundColor || "#38bdf8",
-  color: "#ffffff",
+const flux = reactive({
+  buttonStyle: {
+    backgroundColor: props.backgroundColor || "#38bdf8",
+    color: "#ffffff",
+  },
+  applyHoverColor() {
+    flux.buttonStyle.backgroundColor = props.hoverColor || "#0ea5e9";
+  },
+  removeHoverColor() {
+    flux.buttonStyle.backgroundColor = props.backgroundColor || "#38bdf8";
+  },
 });
-
-const applyHoverColor = () => {
-  buttonStyle.value.backgroundColor = props.hoverColor || "#0ea5e9";
-};
-
-const removeHoverColor = () => {
-  buttonStyle.value.backgroundColor = props.backgroundColor || "#38bdf8";
-};
 </script>
 
 <style lang="scss" scoped>

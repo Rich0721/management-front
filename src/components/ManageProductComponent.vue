@@ -2,7 +2,10 @@
   <div class="product-container">
     <div class="product-header">
       <div class="product-title">{{ title }}</div>
-      <div class="product-date">{{ date }}</div>
+      <div class="product-info">
+        <span class="product-author">Author: 吳冠榮</span>
+        <span class="product-date">2025-03-25</span>
+      </div>
     </div>
 
     <!-- 商品簡介 -->
@@ -46,6 +49,10 @@ const props = defineProps<{
   description: string;
 }>();
 
+const handleView = () => {
+  console.log("View: ", props.productNumber);
+};
+
 const handleEdit = () => {
   console.log("Edit: ", props.productNumber);
 };
@@ -83,17 +90,31 @@ const handleDelete = () => {
     margin: 0;
   }
 
-  .product-date {
-    font-size: 10px;
+  .product-info {
+    display: flex;
+    flex-direction: row; /* 正常排列順序 */
+    align-items: center; /* 垂直對齊 */
     position: absolute; /* 絕對定位 */
-    bottom: 0; /* 將日期放置在容器的底部 */
-    right: 0; /* 將日期放置在容器的右側 */
-    color: #3e3e3e;
+    right: 0;
+    bottom: 0;
+
+    .product-author {
+      font-size: 10px;
+      margin-right: 10px; /* 添加間距 */
+      color: #3e3e3e;
+    }
+
+    .product-date {
+      font-size: 10px;
+      color: #3e3e3e;
+    }
   }
 }
 
 /* 商品簡介 */
 .product-description {
+  text-align: left;
+  font-size: 12px;
   color: #000000;
   padding: 10px;
   margin-top: 10px;
