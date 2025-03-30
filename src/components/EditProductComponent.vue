@@ -2,59 +2,87 @@
   <div class="main-container">
     <div class="product-container">
       <!-- 左側圖片區域 -->
-      <div class="product-image">圖片</div>
+      <div class="product-image">
+        <!-- 上部區域：主圖片預覽和左右切換 -->
+        <div class="image-preview">
+          <button @click="prevImage" class="nav-button">←</button>
+          <img :src="currentImage" alt="主圖片" />
+          <button @click="nextImage" class="nav-button">→</button>
+        </div>
 
+        <!-- 下部區域：縮略圖和上傳按鈕 -->
+        <div class="image-thumbnails">
+          <div class="thumbnails-wrapper">
+            <div
+              v-for="(image, index) in visibleThumbnails"
+              :key="index"
+              class="thumbnail"
+              @click="setCurrentImage(index + thumbnailStartIndex)"
+            >
+              <img :src="image" alt="縮略圖" />
+            </div>
+            <!-- 顯示上傳按鈕（當圖片數量小於 10 時） -->
+            <div
+              v-for="index in Math.max(0, 10 - images.length)"
+              :key="'upload-' + index"
+              class="thumbnail upload-icon"
+              @click="uploadImage"
+            >
+              +
+            </div>
+          </div>
+        </div>
+      </div>
       <!-- 右側商品資訊區域 -->
       <div class="product-info">
         <div class="form-group">
-          <input type="text" placeholder="商品名稱" />
+          <input-text label="商品名稱" v-model="contentData.name" />
         </div>
         <div class="form-group">
-          <input
-            type="number"
-            placeholder="商品價格"
-            min="1"
-            @input="validatePrice"
-          />
+          <input-number label="商品價格" v-model="contentData.price" />
         </div>
         <div class="form-group">
-          <input type="text" placeholder="商品種類" />
+          <input-text label="商品分類" v-model="contentData.category" />
         </div>
         <div class="form-group">
-          <textarea placeholder="商品簡介"></textarea>
+          <InputArea label="商品簡介" v-model="contentData.description" />
         </div>
       </div>
     </div>
     <div>
       <ckeditor
         v-if="ClassicEditor && config"
-        v-model="data"
+        v-model="contentData.content"
         :editor="ClassicEditor"
         :config="config"
       />
     </div>
     <!-- 操作按鈕 -->
     <div class="product-actions">
-      <button-component
-        @click="handleEdit"
-        backgroundColor="#38bdf8"
-        hoverColor="#0ea5e9"
-      >
-        儲存
-      </button-component>
-      <button-component
-        @click="handleDelete"
-        backgroundColor="#ef4444"
-        hoverColor="#dc2626"
-      >
-        取消
-      </button-component>
+      <div class="button-wrapper">
+        <button-component
+          @click="handleSumbit(contentData)"
+          backgroundColor="#38bdf8"
+          hoverColor="#0ea5e9"
+        >
+          儲存
+        </button-component>
+      </div>
+      <div class="button-wrapper">
+        <button-component
+          @click="handleDelete"
+          backgroundColor="#ef4444"
+          hoverColor="#dc2626"
+        >
+          取消
+        </button-component>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, defineProps, reactive } from "vue";
 import {
   ClassicEditor,
   Essentials,
@@ -100,11 +128,19 @@ import {
   Highlight,
 } from "ckeditor5";
 import { Ckeditor } from "@ckeditor/ckeditor5-vue";
-import ButtonComponent from "./ButtonComponent.vue";
+import { InputText, InputNumber, InputArea, ButtonComponent } from "./Basics";
+import { Product } from "@/types/Product";
+import {
+  handleSumbit,
+  handleDelete,
+  clickPrev,
+  clickNext,
+} from "@/store/EditProductStore";
 
 const isLayoutReady = ref(false);
 
-const data = ref("<p>Hello world!</p>");
+const props = defineProps<Product>();
+const contentData = reactive({ ...props });
 
 const config = computed(() => {
   if (!isLayoutReady.value) {
@@ -223,6 +259,50 @@ const config = computed(() => {
 onMounted(() => {
   isLayoutReady.value = true;
 });
+
+// Reactive data for images
+const images = ref<string[]>([
+  "https://via.placeholder.com/300", // Example image URLs
+  "https://via.placeholder.com/300",
+  "https://via.placeholder.com/300",
+  "https://via.placeholder.com/300",
+  "https://via.placeholder.com/300",
+]);
+
+const currentImageIndex = ref(0);
+const thumbnailStartIndex = ref(0);
+const thumbnailsPerPage = 3; // Number of thumbnails to display at a time
+
+// Computed property for the currently displayed image
+const currentImage = computed(() => images.value[currentImageIndex.value]);
+
+// Computed property for visible thumbnails
+const visibleThumbnails = computed(() =>
+  images.value.slice(
+    thumbnailStartIndex.value,
+    thumbnailStartIndex.value + thumbnailsPerPage
+  )
+);
+
+// Methods for navigation and image management
+const prevImage = () => {
+  currentImageIndex.value = clickPrev(currentImageIndex.value, images.value);
+};
+
+const nextImage = () => {
+  currentImageIndex.value = clickNext(currentImageIndex.value, images.value);
+};
+
+const setCurrentImage = (index: number) => {
+  currentImageIndex.value = index;
+};
+
+const uploadImage = () => {
+  if (images.value.length < 10) {
+    // Simulate an image upload
+    images.value.push("https://via.placeholder.com/300");
+  }
+};
 </script>
 
 <style lang="scss" scoped>
@@ -238,7 +318,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column; /* 垂直排列 */
   align-items: center; /* 水平置中 */
-  justify-content: center; /* 垂直置中 */
+  justify-content: flex-start;
   width: 100%; /* 父容器寬度 */
   min-height: 100vh; /* 讓內容至少占滿視窗高度 */
   padding: 20px; /* 添加內邊距 */
@@ -268,39 +348,111 @@ onMounted(() => {
 }
 
 .product-image {
-  flex: 2; /* 左側圖片區域占 1 比例 */
-  border-right: 1px solid #ccc; /* 添加右側邊框 */
+  width: 66.67%; /* 寬度設置為網頁的 2/3 */
+  max-width: 800px;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column; /* 垂直排列 */
+  justify-content: space-between;
   padding: 10px;
+  border-right: 1px solid #ccc;
+
+  .image-preview,
+  .image-thumbnails {
+    width: 100%; /* 寬度相同，填滿父容器 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .image-preview {
+    height: 90%; /* 高度占父容器的 90% */
+    margin-bottom: 10px;
+
+    img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .nav-button {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+
+    .nav-button:first-of-type {
+      left: 10px;
+    }
+
+    .nav-button:last-of-type {
+      right: 10px;
+    }
+  }
+
+  .image-thumbnails {
+    height: 10%; /* 高度占父容器的 10% */
+    gap: 5px;
+
+    .thumbnail-nav-button {
+      background-color: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 5px;
+    }
+
+    .thumbnails-wrapper {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 5px;
+      overflow: hidden;
+    }
+
+    .thumbnail {
+      width: 50px;
+      height: 50px;
+      border: 1px solid #ccc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+
+      img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: cover;
+      }
+
+      &.upload-icon {
+        background-color: #f0f0f0;
+        font-size: 24px;
+        font-weight: bold;
+        color: #888;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+  }
 }
 
 .product-info {
   flex: 1; /* 右側商品資訊區域占 2 比例 */
   padding: 10px;
+  width: 33.33%; /* 寬度設置為網頁的 1/3 */
+  max-width: 400px;
 
   .form-group {
     display: flex; /* 使用 flexbox 將標題和輸入框並列 */
     align-items: center; /* 垂直居中 */
     margin-bottom: 10px;
-
-    h3 {
-      flex: 0 0 100px; /* 固定標題寬度 */
-      margin: 0;
-    }
-
-    input,
-    textarea {
-      flex: 1; /* 輸入框占據剩餘空間 */
-      padding: 5px;
-      box-sizing: border-box; /* 確保 padding 不影響寬度 */
-    }
-
-    textarea {
-      height: 300px; /* 設置初始高度為 300px */
-      resize: vertical; /* 允許用戶垂直調整大小 */
-    }
   }
 }
 
@@ -314,9 +466,22 @@ onMounted(() => {
 /* 操作按鈕區域 */
 .product-actions {
   display: flex; /* 使用 flexbox 排列按鈕 */
-  justify-content: flex-end; /* 按鈕靠右對齊 */
+  justify-content: center; /* 按鈕居中對齊 */
   align-items: center; /* 垂直居中 */
-  gap: 10px; /* 按鈕之間的間距 */
+  gap: 20px; /* 按鈕之間的間距 */
   margin-top: 20px; /* 與上方內容保持間距 */
+  width: 100%; /* 填滿父容器寬度 */
+  z-index: 10; /* 確保按鈕不會被其他內容覆蓋 */
+  position: relative; /* 確保 z-index 生效 */
+
+  .button-wrapper {
+    flex: 1; /* 每個按鈕區域占據 50% 的寬度 */
+    display: flex;
+    justify-content: flex-end; /* 按鈕靠右對齊 */
+  }
+
+  .button-wrapper:last-of-type {
+    justify-content: flex-start; /* 右側按鈕靠左對齊 */
+  }
 }
 </style>

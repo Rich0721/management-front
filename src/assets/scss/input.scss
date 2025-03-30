@@ -1,0 +1,37 @@
+.input-group {
+  position: relative;
+
+  .input-group-input {
+    font: inherit;
+    color: #333; /* 深灰色文字，適配白底 */
+    padding: 10px;
+    border: 1px solid #ccc; /* 添加邊框，適配白底 */
+    border-radius: 4px;
+    outline: 2px solid transparent; /* 初始無邊框 */
+    background-color: #fff; /* 白色背景 */
+    transition: outline-color 500ms, border-color 500ms;
+
+    &:focus {
+      outline-color: #3c50eb; /* 聚焦時的藍色邊框 */
+      border-color: #3c50eb; /* 聚焦時的藍色邊框 */
+    }
+  }
+
+  .input-group-lable {
+    position: absolute;
+    top: 0;
+    left: 0;
+    translate: 10px 10px;
+    color: #666; /* 中灰色文字，適配白底 */
+    transition: translate 500ms, scale 500ms, color 500ms;
+  }
+
+  .input-group-input:focus + .input-group-lable,
+  .input-group-input:valid + .input-group-lable {
+    padding-inline: 5px;
+    translate: 0px -14px;
+    scale: 0.8;
+    background-color: #fff; /* 白色背景，與輸入框一致 */
+    color: #3c50eb; /* 聚焦時的藍色標籤文字 */
+  }
+}
