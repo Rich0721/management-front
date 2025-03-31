@@ -1,7 +1,10 @@
 .input-group {
   position: relative;
+  margin-bottom: 10px;
 
   .input-group-input {
+    width: 90%;
+    max-width: 300px;
     font: inherit;
     color: #333; /* 深灰色文字，適配白底 */
     padding: 10px;

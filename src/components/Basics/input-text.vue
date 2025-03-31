@@ -14,11 +14,12 @@
 <script setup lang="ts">
 import { defineProps, ref, defineEmits } from "vue";
 
-const message = ref("");
-
-defineProps<{
+const props = defineProps<{
+  content?: string;
   label: string;
 }>();
+
+const message = ref(props.content);
 
 // 定義 emits
 const emit = defineEmits<{

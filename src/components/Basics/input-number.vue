@@ -15,12 +15,12 @@
 <script setup lang="ts">
 import { defineProps, ref, defineEmits } from "vue";
 
-const message = ref(1);
-
-defineProps<{
+const props = defineProps<{
+  content?: number;
   label: string;
 }>();
 
+const message = ref(props.content || 1);
 // 定義 emits
 const emit = defineEmits<{
   (e: "update:modelValue", value: number): void;

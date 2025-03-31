@@ -3,65 +3,32 @@
     <div class="product-container">
       <!-- 左側圖片區域 -->
       <div class="product-image">
-        <!-- 上部區域：主圖片預覽和左右切換 -->
-        <div class="image-preview">
-          <button @click="prevImage" class="nav-button">←</button>
-          <img :src="currentImage" alt="主圖片" />
-          <button @click="nextImage" class="nav-button">→</button>
-        </div>
-
-        <!-- 下部區域：縮略圖和上傳按鈕 -->
-        <div class="image-thumbnails">
-          <div class="thumbnails-wrapper">
-            <div
-              v-for="(image, index) in visibleThumbnails"
-              :key="index"
-              class="thumbnail"
-              @click="setCurrentImage(index + thumbnailStartIndex)"
-            >
-              <img :src="image" alt="縮略圖" />
-            </div>
-            <!-- 顯示上傳按鈕（當圖片數量小於 10 時） -->
-            <div
-              v-for="index in Math.max(0, 10 - images.length)"
-              :key="'upload-' + index"
-              class="thumbnail upload-icon"
-              @click="uploadImage"
-            >
-              +
-            </div>
-          </div>
-        </div>
+        <image-show
+          :images="contentData.images"
+          @updateImage="(val) => (contentData.images = val)"
+        />
       </div>
       <!-- 右側商品資訊區域 -->
       <div class="product-info">
-        <div class="form-group">
-          <input-text label="商品名稱" v-model="contentData.name" />
-        </div>
-        <div class="form-group">
-          <input-number label="商品價格" v-model="contentData.price" />
-        </div>
-        <div class="form-group">
-          <input-text label="商品分類" v-model="contentData.category" />
-        </div>
-        <div class="form-group">
-          <InputArea label="商品簡介" v-model="contentData.description" />
-        </div>
+        <input-text label="商品名稱" :content="contentData.name" />
+        <input-number label="商品價格" :content="contentData.price" />
+        <input-text label="商品分類" :content="contentData.category" />
+        <InputArea label="商品簡介" :content="contentData.description" />
       </div>
     </div>
-    <div>
-      <ckeditor
-        v-if="ClassicEditor && config"
-        v-model="contentData.content"
-        :editor="ClassicEditor"
-        :config="config"
-      />
-    </div>
+
+    <ckeditor
+      v-if="ClassicEditor && config"
+      v-model="contentData.content"
+      :editor="ClassicEditor"
+      :config="config"
+    />
+
     <!-- 操作按鈕 -->
     <div class="product-actions">
       <div class="button-wrapper">
         <button-component
-          @click="handleSumbit(contentData)"
+          @click="clickSubmit(contentData)"
           backgroundColor="#38bdf8"
           hoverColor="#0ea5e9"
         >
@@ -82,7 +49,14 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted, defineProps, reactive } from "vue";
+import {
+  ref,
+  computed,
+  onMounted,
+  defineProps,
+  reactive,
+  defineEmits,
+} from "vue";
 import {
   ClassicEditor,
   Essentials,
@@ -128,18 +102,24 @@ import {
   Highlight,
 } from "ckeditor5";
 import { Ckeditor } from "@ckeditor/ckeditor5-vue";
-import { InputText, InputNumber, InputArea, ButtonComponent } from "./Basics";
-import { Product } from "@/types/Product";
 import {
-  handleSumbit,
-  handleDelete,
-  clickPrev,
-  clickNext,
-} from "@/store/EditProductStore";
+  InputText,
+  InputNumber,
+  InputArea,
+  ButtonComponent,
+  ImageShow,
+} from "./Basics";
+import { Product } from "@/types/Product";
+import { handleSumbit, handleDelete } from "@/store/EditProductStore";
 
 const isLayoutReady = ref(false);
 
 const props = defineProps<Product>();
+console.log(props);
+const emits = defineEmits<{
+  sumbit: [data: Product];
+  delete: [index: number];
+}>();
 const contentData = reactive({ ...props });
 
 const config = computed(() => {
@@ -260,48 +240,9 @@ onMounted(() => {
   isLayoutReady.value = true;
 });
 
-// Reactive data for images
-const images = ref<string[]>([
-  "https://via.placeholder.com/300", // Example image URLs
-  "https://via.placeholder.com/300",
-  "https://via.placeholder.com/300",
-  "https://via.placeholder.com/300",
-  "https://via.placeholder.com/300",
-]);
-
-const currentImageIndex = ref(0);
-const thumbnailStartIndex = ref(0);
-const thumbnailsPerPage = 3; // Number of thumbnails to display at a time
-
-// Computed property for the currently displayed image
-const currentImage = computed(() => images.value[currentImageIndex.value]);
-
-// Computed property for visible thumbnails
-const visibleThumbnails = computed(() =>
-  images.value.slice(
-    thumbnailStartIndex.value,
-    thumbnailStartIndex.value + thumbnailsPerPage
-  )
-);
-
-// Methods for navigation and image management
-const prevImage = () => {
-  currentImageIndex.value = clickPrev(currentImageIndex.value, images.value);
-};
-
-const nextImage = () => {
-  currentImageIndex.value = clickNext(currentImageIndex.value, images.value);
-};
-
-const setCurrentImage = (index: number) => {
-  currentImageIndex.value = index;
-};
-
-const uploadImage = () => {
-  if (images.value.length < 10) {
-    // Simulate an image upload
-    images.value.push("https://via.placeholder.com/300");
-  }
+const clickSubmit = (data: Product) => {
+  handleSumbit(data);
+  emits("sumbit", data);
 };
 </script>
 
@@ -339,8 +280,20 @@ const uploadImage = () => {
 .editor-container {
   width: 66.67%; /* 寬度設置為網頁的 2/3 */
   max-width: 1200px; /* 設置最大寬度，避免過大 */
-  margin: 10px 0; /* 上下間距 */
+  height: 400px; /* 固定高度 */
+  margin: 30px 0; /* 上下間距 */
   display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box; /* 確保 padding 不影響寬度和高度 */
+  background-color: #fff; /* 背景色 */
+  border: 1px solid #ccc; /* 添加邊框 */
+  border-radius: 10px; /* 添加圓角 */
+}
+.ck-editor__editable {
+  height: 100%; /* 讓編輯區域填滿父容器的高度 */
+  overflow-y: auto; /* 如果內容超出，顯示滾動條 */
 }
 
 .product-container {
@@ -355,92 +308,6 @@ const uploadImage = () => {
   justify-content: space-between;
   padding: 10px;
   border-right: 1px solid #ccc;
-
-  .image-preview,
-  .image-thumbnails {
-    width: 100%; /* 寬度相同，填滿父容器 */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-  }
-
-  .image-preview {
-    height: 90%; /* 高度占父容器的 90% */
-    margin-bottom: 10px;
-
-    img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-    }
-
-    .nav-button {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      background-color: rgba(0, 0, 0, 0.5);
-      color: #fff;
-      border: none;
-      padding: 5px 10px;
-      cursor: pointer;
-    }
-
-    .nav-button:first-of-type {
-      left: 10px;
-    }
-
-    .nav-button:last-of-type {
-      right: 10px;
-    }
-  }
-
-  .image-thumbnails {
-    height: 10%; /* 高度占父容器的 10% */
-    gap: 5px;
-
-    .thumbnail-nav-button {
-      background-color: rgba(0, 0, 0, 0.5);
-      color: #fff;
-      border: none;
-      padding: 5px 10px;
-      cursor: pointer;
-      font-size: 16px;
-      border-radius: 5px;
-    }
-
-    .thumbnails-wrapper {
-      display: flex;
-      flex-wrap: nowrap;
-      gap: 5px;
-      overflow: hidden;
-    }
-
-    .thumbnail {
-      width: 50px;
-      height: 50px;
-      border: 1px solid #ccc;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-
-      img {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: cover;
-      }
-
-      &.upload-icon {
-        background-color: #f0f0f0;
-        font-size: 24px;
-        font-weight: bold;
-        color: #888;
-        justify-content: center;
-        align-items: center;
-      }
-    }
-  }
 }
 
 .product-info {
@@ -448,19 +315,6 @@ const uploadImage = () => {
   padding: 10px;
   width: 33.33%; /* 寬度設置為網頁的 1/3 */
   max-width: 400px;
-
-  .form-group {
-    display: flex; /* 使用 flexbox 將標題和輸入框並列 */
-    align-items: center; /* 垂直居中 */
-    margin-bottom: 10px;
-  }
-}
-
-.editor-container {
-  display: flex; /* 確保內部佈局正常 */
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
 }
 
 /* 操作按鈕區域 */
