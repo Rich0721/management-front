@@ -3,20 +3,54 @@
     <h1 class="title">Test Name</h1>
 
     <div class="menu">
-      <h2 class="menu-item" v-show="isLogin">新增商品</h2>
-      <h2 class="menu-item" v-show="isLogin">盤點</h2>
-      <h2 class="menu-item" v-show="isLogin">銷售紀錄</h2>
-      <h2 class="menu-item" v-show="canManage">權限管理</h2>
+      <div
+        class="menu-item"
+        @mouseover="showSubMenu('product')"
+        @mouseleave="hideSubMenu"
+      >
+        商品管理
+        <!-- 子菜單 -->
+        <div class="sub-menu" v-if="activeMenu === 'product'">
+          <h4 class="sub-menu-item" @click="router.push({ name: 'edit' })">
+            新增商品
+          </h4>
+          <h4 class="sub-menu-item">盤點商品</h4>
+          <h4 class="sub-menu-item">銷售紀錄</h4>
+        </div>
+      </div>
 
-      <button v-show="isLogin" @click="logout">登出</button>
+      <div
+        class="menu-item"
+        @mouseover="showSubMenu('admin')"
+        @mouseleave="hideSubMenu"
+      >
+        系統管理
+        <!-- 子菜單 -->
+        <div class="sub-menu" v-if="activeMenu === 'admin'">
+          <h4 class="sub-menu-item">權限管理</h4>
+          <h4 class="sub-menu-item">用戶管理</h4>
+        </div>
+      </div>
+
+      <!-- 子菜單 -->
+      <button-component
+        @click="logout"
+        backgroundColor="#ef4444"
+        hoverColor="#dc2626"
+      >
+        登出
+      </button-component>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { UserPermission, UserInfo } from "@/types/userInfo";
-import { defineEmits, defineProps, onBeforeUpdate, computed } from "vue";
+import { defineEmits, defineProps, onBeforeUpdate, computed, ref } from "vue";
+import { ButtonComponent } from "@/components/Basics";
+import router from "@/router";
 
+const activeMenu = ref<string | null>(null); // 用於追蹤當前顯示的子菜單
 const props = defineProps<{
   userInfo: UserInfo;
 }>();
@@ -29,6 +63,14 @@ const isLogin = computed(
 const canManage = computed(
   () => props.userInfo.userPermission === UserPermission.ADMIN
 );
+
+const showSubMenu = (menu: string) => {
+  activeMenu.value = menu; // 顯示對應的子菜單
+};
+
+const hideSubMenu = () => {
+  activeMenu.value = null; // 隱藏子菜單
+};
 
 const logout = () => {
   const userInfo = {} as UserInfo;
@@ -67,11 +109,13 @@ onBeforeUpdate(() => {
   flex-direction: row; /* 水平排列 */
   align-items: center; /* 垂直居中 */
   gap: 20px; /* 增加項目之間的間距 */
+  position: relative; /* 確保子菜單定位基於主菜單 */
 }
 
 .menu-item {
+  position: relative; /* 為子菜單定位 */
   margin: 0;
-  color: #38bdf8; /* 淺藍色文字 */
+  color: #38bdf8;
   cursor: pointer;
   transition: border-bottom 0.3s ease, color 0.3s ease;
 }
@@ -81,19 +125,27 @@ onBeforeUpdate(() => {
   color: #f8fafc; /* 懸停時變為白色 */
 }
 
-.menu button {
-  padding: 10px 20px;
-  background-color: #ef4444; /* 鮮紅色按鈕背景 */
-  color: #ffffff; /* 白色文字 */
-  border: none;
-  border-radius: 20px; /* 圓弧形 */
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s ease;
+.sub-menu {
+  position: absolute;
+  width: 100%;
+  top: 100%; /* 子菜單顯示在主菜單下方 */
+  left: 0;
+  background-color: #334155; /* 深灰色背景 */
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 10;
 }
 
-.menu button:hover {
-  background-color: #dc2626; /* 懸停時更深的紅色 */
+.sub-menu-item {
+  margin: 5px 0;
+  color: #f8fafc;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.sub-menu-item:hover {
+  color: #38bdf8;
 }
 
 /* RWD: 小螢幕樣式 */

@@ -12,14 +12,14 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, ref, defineEmits } from "vue";
+import { defineProps, ref, defineEmits, watch } from "vue";
 
 const props = defineProps<{
   content?: string;
   label: string;
 }>();
 
-const message = ref(props.content);
+const message = ref(props.content || "");
 
 // 定義 emits
 const emit = defineEmits<{
@@ -30,6 +30,13 @@ const emit = defineEmits<{
 const emitValue = () => {
   emit("update:modelValue", message.value);
 };
+
+watch(
+  () => props.content,
+  (newValue) => {
+    message.value = newValue || "";
+  }
+);
 </script>
 
 <style scoped lang="scss">

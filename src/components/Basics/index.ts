@@ -3,5 +3,13 @@ import InputNumber from "./input-number.vue";
 import InputArea from "./input-area.vue";
 import ButtonComponent from "./button-component.vue";
 import ImageShow from "./image-show.vue";
+import EditComponent from "./edit-component.vue";
 
-export { InputText, InputNumber, InputArea, ButtonComponent, ImageShow };
+export {
+  InputText,
+  InputNumber,
+  InputArea,
+  ButtonComponent,
+  ImageShow,
+  EditComponent,
+};

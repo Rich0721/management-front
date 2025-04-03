@@ -10,15 +10,10 @@
     date="2021-10-01"
     description="Product Description"
   />-->
-
-  <EditProductComponent />
 </template>
 
 <script setup lang="ts">
-import HeaderComponent from "@/components/HeaderComponent.vue";
-import LogComponent from "@/components/LogComponent.vue";
-import ManageProductComponent from "@/components/ManageProductComponent.vue";
-import EditProductComponent from "@/components/EditProductComponent.vue";
+import HeaderComponent from "./HeaderComponent.vue";
 
 import { UserInfo } from "@/types/userInfo";
 import { ref, onBeforeUpdate } from "vue";

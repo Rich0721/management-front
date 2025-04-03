@@ -30,7 +30,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, defineProps, defineEmits } from "vue";
+import { ref, computed, defineProps, defineEmits, watch } from "vue";
 import { clickPrev, clickNext } from "./image-show";
 import { ImageShowProps } from "./image-show";
 
@@ -99,6 +99,13 @@ const removeImage = (index: number) => {
     emit("updateImage", images.value);
   }
 };
+
+watch(
+  () => props.images,
+  (newImages) => {
+    images.value = newImages || [];
+  }
+);
 </script>
 
 <style lang="scss" scoped>

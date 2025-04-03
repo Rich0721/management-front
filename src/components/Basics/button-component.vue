@@ -39,8 +39,8 @@ const flux = reactive({
   font-size: 20px;
   font-weight: bold;
   cursor: pointer;
-  position: absolute;
   overflow: hidden;
+  z-index: 1;
 }
 
 .button:hover {
