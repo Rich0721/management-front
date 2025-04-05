@@ -10,10 +10,31 @@
       </div>
       <!-- 右側商品資訊區域 -->
       <div class="product-info">
-        <input-text label="商品名稱" v-model="contentData.data.name" />
-        <input-number label="商品價格" v-model="contentData.data.price" />
-        <input-text label="商品分類" v-model="contentData.data.category" />
-        <InputArea label="商品簡介" v-model="contentData.data.description" />
+        <input-text
+          label="商品名稱"
+          :content="contentData.data.name"
+          @update:model-value="(val) => (contentData.data.name = val)"
+        />
+        <input-number
+          label="商品成本"
+          :content="contentData.data.cost"
+          @update:model-value="(val) => (contentData.data.cost = val)"
+        />
+        <input-number
+          label="商品價格"
+          :content="contentData.data.price"
+          @update:model-value="(val) => (contentData.data.price = val)"
+        />
+        <input-text
+          label="商品分類"
+          :content="contentData.data.category"
+          @update:model-value="(val) => (contentData.data.category = val)"
+        />
+        <input-area
+          label="商品簡介"
+          :content="contentData.data.description"
+          @update:model-value="(val) => (contentData.data.description = val)"
+        />
       </div>
     </div>
 
@@ -32,7 +53,7 @@
       </div>
       <div class="button-wrapper">
         <button-component
-          @click="handleDelete"
+          @click="clickCancel"
           backgroundColor="#ef4444"
           hoverColor="#dc2626"
         >
@@ -44,8 +65,8 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, reactive, defineEmits, onMounted, watch } from "vue";
-
+import { reactive, onMounted, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import {
   InputText,
   InputNumber,
@@ -55,20 +76,18 @@ import {
   EditComponent,
 } from "@/components/Basics";
 import { Product } from "@/types/Product";
-import { handleSumbit, handleDelete } from "@/store/EditProductStore";
+import { EditEnum } from "@/types/enums/EditEnum";
+import { handleSumbit } from "@/store/EditProductStore";
 import { request } from "@/services/requestAxios";
 
-const props = defineProps<{
-  code?: number;
-}>();
-const emits = defineEmits<{
-  sumbit: [data: Product];
-  delete: [index: number];
-}>();
+const route = useRoute();
+const router = useRouter();
+const productId = route.params.id;
 const contentData = reactive({
   data: {
     code: "",
     name: "",
+    cost: 0,
     price: 0,
     category: "",
     description: "",
@@ -77,9 +96,19 @@ const contentData = reactive({
   } as Product,
 });
 
-const clickSubmit = (data: Product) => {
-  handleSumbit(data);
-  emits("sumbit", data);
+const clickSubmit = async (data: Product) => {
+  const status: number = await handleSumbit(data);
+  if (status === 200) {
+    router.replace({ path: "/edit" });
+  } else {
+    console.error("Error submitting data:", status);
+  }
+};
+
+const clickCancel = () => {
+  if (confirm("確定要取消嗎？")) {
+    router.replace({ path: "/edit" });
+  }
 };
 
 watch(
@@ -92,18 +121,21 @@ watch(
 
 onMounted(() => {
   // 初始化資料
-  if (props.code === undefined) {
+  if (productId === EditEnum.ININITIAL_ID) {
     contentData.data.code = "";
     contentData.data.name = "";
+    contentData.data.cost = 0;
     contentData.data.price = 1;
     contentData.data.category = "";
     contentData.data.description = "";
     contentData.data.content = "<p>請輸入內容</p>";
   } else {
+    // 設置加載中狀態
     request
-      .get<Product>(`/edit/getProduct/${props.code}`)
+      .get<Product>(`/edit/getProduct/${productId}`)
       .then((response) => {
-        contentData.data = response.data;
+        contentData.data.description = response.data.description;
+        Object.assign(contentData.data, response.data);
       })
       .catch((error) => {
         console.error("Error fetching product data:", error);
@@ -169,7 +201,7 @@ onMounted(() => {
 }
 
 .product-info {
-  flex: 1; /* 右側商品資訊區域占 2 比例 */
+  flex: 1; /* 右側商品資訊區域占 1 比例 */
   padding: 10px;
   width: 33.33%; /* 寬度設置為網頁的 1/3 */
   max-width: 400px;

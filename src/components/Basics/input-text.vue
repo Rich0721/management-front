@@ -18,7 +18,6 @@ const props = defineProps<{
   content?: string;
   label: string;
 }>();
-
 const message = ref(props.content || "");
 // 定義 emits
 const emit = defineEmits<{

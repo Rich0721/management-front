@@ -11,7 +11,15 @@
         商品管理
         <!-- 子菜單 -->
         <div class="sub-menu" v-if="activeMenu === 'product'">
-          <h4 class="sub-menu-item" @click="router.push({ name: 'edit' })">
+          <h4
+            class="sub-menu-item"
+            @click="
+              router.push({
+                name: 'edit-product',
+                params: { id: EditEnum.ININITIAL_ID },
+              })
+            "
+          >
             新增商品
           </h4>
           <h4 class="sub-menu-item">盤點商品</h4>
@@ -34,7 +42,7 @@
 
       <!-- 子菜單 -->
       <button-component
-        @click="logout"
+        @click="() => router.push({ name: 'edit' })"
         backgroundColor="#ef4444"
         hoverColor="#dc2626"
       >
@@ -45,24 +53,12 @@
 </template>
 
 <script setup lang="ts">
-import { UserPermission, UserInfo } from "@/types/userInfo";
-import { defineEmits, defineProps, onBeforeUpdate, computed, ref } from "vue";
+import { ref } from "vue";
 import { ButtonComponent } from "@/components/Basics";
+import { EditEnum } from "@/types/enums/EditEnum";
 import router from "@/router";
 
 const activeMenu = ref<string | null>(null); // 用於追蹤當前顯示的子菜單
-const props = defineProps<{
-  userInfo: UserInfo;
-}>();
-
-const emits = defineEmits(["logout"]);
-
-const isLogin = computed(
-  () => props.userInfo.userName !== "" && props.userInfo.userName !== undefined
-);
-const canManage = computed(
-  () => props.userInfo.userPermission === UserPermission.ADMIN
-);
 
 const showSubMenu = (menu: string) => {
   activeMenu.value = menu; // 顯示對應的子菜單
@@ -72,14 +68,14 @@ const hideSubMenu = () => {
   activeMenu.value = null; // 隱藏子菜單
 };
 
-const logout = () => {
-  const userInfo = {} as UserInfo;
-  emits("logout", userInfo);
-};
+// const logout = () => {
+//   const userInfo = {} as UserInfo;
+//   emits("logout", userInfo);
+// };
 
-onBeforeUpdate(() => {
-  console.log("User Log out");
-});
+// onBeforeUpdate(() => {
+//   console.log("User Log out");
+// });
 </script>
 
 <style lang="scss" scoped>

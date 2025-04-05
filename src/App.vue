@@ -1,6 +1,13 @@
 <template>
-  <router-view />
+  <div class="app">
+    <header-component />
+    <router-view />
+  </div>
 </template>
+
+<script setup lang="ts">
+import HeaderComponent from "@/views/HeaderComponent.vue";
+</script>
 
 <style lang="scss">
 #app {

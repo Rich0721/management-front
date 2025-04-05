@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import HomeView from "../views/HomeView.vue";
-import EditProductComponent from "@/views/Edit/EditProductComponent.vue";
+import EditIndex from "@/views/Edit/EditIndex.vue";
+import EditProduct from "@/views/Edit/EditProduct.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -11,7 +12,18 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/edit",
     name: "edit",
-    component: EditProductComponent,
+    children: [
+      {
+        path: "",
+        component: EditIndex,
+      },
+      {
+        path: "/edit/:id",
+        name: "edit-product",
+        component: EditProduct,
+        props: true,
+      },
+    ],
   },
 ];
 
