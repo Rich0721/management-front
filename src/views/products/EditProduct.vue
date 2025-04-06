@@ -76,7 +76,7 @@ import {
   EditComponent,
 } from "@/components/Basics";
 import { Product } from "@/types/Product";
-import { EditEnum } from "@/types/enums/EditEnum";
+import { EditEnum, RouterPath } from "@/types/enums";
 import { handleSumbit } from "@/store/EditProductStore";
 import { request } from "@/services/requestAxios";
 
@@ -99,7 +99,7 @@ const contentData = reactive({
 const clickSubmit = async (data: Product) => {
   const status: number = await handleSumbit(data);
   if (status === 200) {
-    router.replace({ path: "/edit" });
+    router.replace({ path: RouterPath.PRODUCTS });
   } else {
     console.error("Error submitting data:", status);
   }
@@ -107,7 +107,7 @@ const clickSubmit = async (data: Product) => {
 
 const clickCancel = () => {
   if (confirm("確定要取消嗎？")) {
-    router.replace({ path: "/edit" });
+    router.replace({ path: RouterPath.PRODUCTS });
   }
 };
 

@@ -30,7 +30,8 @@
   }
 
   .input-group-input:focus + .input-group-lable,
-  .input-group-input:valid + .input-group-lable {
+  .input-group-input:valid + .input-group-lable,
+  .input-group-input[disabled] + .input-group-lable {
     padding-inline: 5px;
     translate: 0px -14px;
     scale: 0.8;

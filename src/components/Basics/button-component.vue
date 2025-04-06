@@ -12,25 +12,18 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, reactive } from "vue";
+import { defineProps } from "vue";
 import { PropsButtonComponent } from "@/types/PropsButtonComponent";
 
 const props = defineProps<PropsButtonComponent>();
-
-const flux = reactive({
-  buttonStyle: {
-    backgroundColor: props.backgroundColor || "#38bdf8",
-    hoverColor: props.hoverColor || "#0ea5e9",
-    color: "#fff",
-  },
-});
 </script>
 
 <style lang="scss" scoped>
 .button {
   scale: 0.5;
-  padding: 0 50px;
-  width: 160px;
+  padding: 0 20px;
+  width: auto;
+  max-width: 200px;
   height: 64px;
   background: var(--background-color, black);
   color: white;

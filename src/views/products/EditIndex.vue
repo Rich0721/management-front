@@ -22,6 +22,7 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { request } from "@/services/requestAxios";
 import { Product, ShowProduct } from "@/types/Product";
+import { RouterPath } from "@/types/enums";
 
 const router = useRouter();
 const productList = ref<ShowProduct[]>([]);
@@ -49,7 +50,7 @@ const fetchProducts = async () => {
 
 const goToEdit = (code?: string) => {
   // Navigate to the edit page with the product ID
-  router.push({ path: `/edit/${code}` });
+  router.push({ path: `${RouterPath.PRODUCTS}/${code}` });
 };
 
 onMounted(fetchProducts);

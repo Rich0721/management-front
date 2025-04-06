@@ -15,14 +15,19 @@
             class="sub-menu-item"
             @click="
               router.push({
-                name: 'edit-product',
+                name: RouterName.EDIT_PRODUCT,
                 params: { id: EditEnum.ININITIAL_ID },
               })
             "
           >
             新增商品
           </h4>
-          <h4 class="sub-menu-item">盤點商品</h4>
+          <h4
+            class="sub-menu-item"
+            @click="router.push({ name: RouterName.STOCK })"
+          >
+            盤點商品
+          </h4>
           <h4 class="sub-menu-item">銷售紀錄</h4>
         </div>
       </div>
@@ -55,7 +60,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { ButtonComponent } from "@/components/Basics";
-import { EditEnum } from "@/types/enums/EditEnum";
+import { EditEnum, RouterName } from "@/types/enums";
 import router from "@/router";
 
 const activeMenu = ref<string | null>(null); // 用於追蹤當前顯示的子菜單

@@ -3,6 +3,7 @@
     <input
       type="text"
       v-model="message"
+      :disabled="isReadonly"
       class="input-group-input"
       @blur="emitValue"
       required
@@ -17,8 +18,10 @@ import { defineProps, ref, defineEmits, watch } from "vue";
 const props = defineProps<{
   content?: string;
   label: string;
+  readonly?: boolean;
 }>();
 const message = ref(props.content || "");
+const isReadonly = ref(props.readonly || false);
 // 定義 emits
 const emit = defineEmits<{
   (e: "update:modelValue", value: string): void;
