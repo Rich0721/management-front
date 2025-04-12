@@ -3,5 +3,5 @@ export interface StockProduct {
   code: string;
   name: string;
   category: string;
-  stock: number;
+  stockNumbers: number;
 }

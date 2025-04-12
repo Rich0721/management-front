@@ -77,8 +77,7 @@ import {
 } from "@/components/Basics";
 import { Product } from "@/types/Product";
 import { EditEnum, RouterPath } from "@/types/enums";
-import { handleSumbit } from "@/store/EditProductStore";
-import { request } from "@/services/requestAxios";
+import { editSubmit, getProductById } from "@/services/EditProductService";
 
 const route = useRoute();
 const router = useRouter();
@@ -97,7 +96,7 @@ const contentData = reactive({
 });
 
 const clickSubmit = async (data: Product) => {
-  const status: number = await handleSumbit(data);
+  const status: number = await editSubmit(data);
   if (status === 200) {
     router.replace({ path: RouterPath.PRODUCTS });
   } else {
@@ -119,7 +118,7 @@ watch(
   { deep: true }
 );
 
-onMounted(() => {
+onMounted(async () => {
   // 初始化資料
   if (productId === EditEnum.ININITIAL_ID) {
     contentData.data.code = "";
@@ -130,16 +129,8 @@ onMounted(() => {
     contentData.data.description = "";
     contentData.data.content = "<p>請輸入內容</p>";
   } else {
-    // 設置加載中狀態
-    request
-      .get<Product>(`/edit/getProduct/${productId}`)
-      .then((response) => {
-        contentData.data.description = response.data.description;
-        Object.assign(contentData.data, response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching product data:", error);
-      });
+    const productInfo = await getProductById(productId as string);
+    Object.assign(contentData.data, productInfo);
   }
 });
 </script>

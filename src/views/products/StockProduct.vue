@@ -1,9 +1,17 @@
 <template>
   <div class="botton-top">
-    <button-component backgroundColor="#38bdf8" hoverColor="#0ea5e9">
+    <button-component
+      @click="exportCode"
+      backgroundColor="#38bdf8"
+      hoverColor="#0ea5e9"
+    >
       產生條碼
     </button-component>
-    <button-component backgroundColor="#38bdf8" hoverColor="#0ea5e9">
+    <button-component
+      @click="exportFile"
+      backgroundColor="#38bdf8"
+      hoverColor="#0ea5e9"
+    >
       輸出檔案
     </button-component>
   </div>
@@ -12,7 +20,7 @@
       <tbody>
         <tr v-for="(item, index) in paginatedProductList" :key="index">
           <td>
-            <input type="checkbox" v-model="item.modfiy" />
+            <input type="checkbox" v-model="item.modify" />
           </td>
           <td>
             <input-text
@@ -38,7 +46,7 @@
           <td>
             <input-number
               label="庫存量"
-              :content="item.stock"
+              :content="item.stockNumbers"
               @update:model-value="(val) => renewProductList(index, val)"
             />
           </td>
@@ -74,27 +82,17 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { InputNumber, InputText, ButtonComponent } from "@/components/Basics";
-import { clickSubmit } from "@/store/StockProductStore";
+import {
+  getStockProducts,
+  updateStockSubmit,
+  clickExportCode,
+  clickExportFile,
+} from "@/services/StockProductService";
+import { StockProduct } from "@/types/StockProduct";
 
-const productList = ref([
-  { modfiy: false, code: "P001", name: "商品1", category: "類別1", stock: 100 },
-  { modfiy: false, code: "P002", name: "商品2", category: "類別2", stock: 200 },
-  { modfiy: false, code: "P003", name: "商品3", category: "類別3", stock: 300 },
-  { modfiy: false, code: "P004", name: "商品1", category: "類別1", stock: 100 },
-  { modfiy: false, code: "P005", name: "商品2", category: "類別2", stock: 200 },
-  { modfiy: false, code: "P006", name: "商品3", category: "類別3", stock: 300 },
-  { modfiy: false, code: "P007", name: "商品1", category: "類別1", stock: 100 },
-  { modfiy: false, code: "P008", name: "商品2", category: "類別2", stock: 200 },
-  { modfiy: false, code: "P009", name: "商品3", category: "類別3", stock: 300 },
-  { modfiy: false, code: "P010", name: "商品1", category: "類別1", stock: 100 },
-  { modfiy: false, code: "P011", name: "商品2", category: "類別2", stock: 200 },
-  { modfiy: false, code: "P012", name: "商品3", category: "類別3", stock: 300 },
-  { modfiy: false, code: "P013", name: "商品1", category: "類別1", stock: 100 },
-  { modfiy: false, code: "P014", name: "商品2", category: "類別2", stock: 200 },
-  { modfiy: false, code: "P015", name: "商品3", category: "類別3", stock: 300 },
-]);
+const productList = ref<StockProduct[]>([]);
 
 // 每頁顯示的數量
 const itemsPerPage = 10;
@@ -109,10 +107,10 @@ const paginatedProductList = computed(() => {
   return productList.value.slice(start, end);
 });
 
-const renewProductList = (index: number, stock: number) => {
+const renewProductList = (index: number, stockNumbers: number) => {
   const productIndex = (currentPage.value - 1) * itemsPerPage + index;
-  productList.value[productIndex].stock = stock;
-  productList.value[productIndex].modfiy = true;
+  productList.value[productIndex].stockNumbers = stockNumbers;
+  productList.value[productIndex].modify = true;
 };
 
 // 總頁數
@@ -126,6 +124,32 @@ const goToPage = (page: number) => {
     currentPage.value = page;
   }
 };
+
+const clickSubmit = () => {
+  const modifiedProducts = productList.value.filter((item) => item.modify);
+  updateStockSubmit(modifiedProducts);
+};
+
+const exportCode = () => {
+  const modifiedProducts = productList.value.filter((item) => item.modify);
+  clickExportCode(modifiedProducts);
+};
+
+const exportFile = () => {
+  clickExportFile();
+};
+
+onMounted(async () => {
+  const products = await getStockProducts();
+  productList.value = products.map((item) => ({
+    modfiy: false,
+    code: item.code || "",
+    name: item.name || "",
+    category: item.category || "",
+    stockNumbers: item.stockNumbers || 0,
+    modify: false,
+  }));
+});
 </script>
 
 <style scoped lang="scss">

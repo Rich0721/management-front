@@ -20,32 +20,28 @@
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { request } from "@/services/requestAxios";
+import { getProductList } from "@/services/EditProductService";
 import { Product, ShowProduct } from "@/types/Product";
 import { RouterPath } from "@/types/enums";
 
 const router = useRouter();
 const productList = ref<ShowProduct[]>([]);
 const fetchProducts = async () => {
-  try {
-    productList.value = []; // Clear the list before fetching
-    const response = await request.get("/edit/getAllProduct");
-    response.data.forEach((item: Product) => {
-      const showProduct: ShowProduct = {
-        code: item.code || "",
-        name: item.name || "",
-        cost: item.cost || 1,
-        price: item.price || 1,
-        category: item.category || "",
-        description: item.description || "", // Assuming images is an array and we want the first image
-        content: item.content || "",
-        images: item.images ? item.images[0] : "", // Assuming images is an array and we want the first image
-      };
-      productList.value.push(showProduct);
-    });
-  } catch (error) {
-    console.error("Error fetching products:", error);
-  }
+  productList.value = [];
+  const products = await getProductList();
+  products.forEach((item: Product) => {
+    const showProduct: ShowProduct = {
+      code: item.code || "",
+      name: item.name || "",
+      cost: item.cost || 1,
+      price: item.price || 1,
+      category: item.category || "",
+      description: item.description || "", // Assuming images is an array and we want the first image
+      content: item.content || "",
+      images: item.images ? item.images[0] : "", // Assuming images is an array and we want the first image
+    };
+    productList.value.push(showProduct);
+  });
 };
 
 const goToEdit = (code?: string) => {
