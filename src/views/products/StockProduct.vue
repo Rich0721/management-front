@@ -91,7 +91,9 @@ import {
   clickExportFile,
 } from "@/services/StockProductService";
 import { StockProduct } from "@/types/StockProduct";
+import { userLogCheck } from "@/services/utils/userLogCheck";
 
+userLogCheck();
 const productList = ref<StockProduct[]>([]);
 
 // 每頁顯示的數量

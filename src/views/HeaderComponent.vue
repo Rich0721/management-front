@@ -4,6 +4,7 @@
 
     <div class="menu">
       <div
+        v-if="isLogin"
         class="menu-item"
         @mouseover="showSubMenu('product')"
         @mouseleave="hideSubMenu"
@@ -11,6 +12,16 @@
         商品管理
         <!-- 子菜單 -->
         <div class="sub-menu" v-if="activeMenu === 'product'">
+          <h4
+            class="sub-menu-item"
+            @click="
+              router.push({
+                name: RouterName.SEALS,
+              })
+            "
+          >
+            銷售平台
+          </h4>
           <h4
             class="sub-menu-item"
             @click="
@@ -33,6 +44,7 @@
       </div>
 
       <div
+        v-if="isAdmin"
         class="menu-item"
         @mouseover="showSubMenu('admin')"
         @mouseleave="hideSubMenu"
@@ -47,7 +59,8 @@
 
       <!-- 子菜單 -->
       <button-component
-        @click="() => router.push({ name: 'edit' })"
+        v-if="isLogin"
+        @click="handleLogout"
         backgroundColor="#ef4444"
         hoverColor="#dc2626"
       >
@@ -58,10 +71,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, computed } from "vue";
+import { useStore } from "vuex";
 import { ButtonComponent } from "@/components/Basics";
 import { EditEnum, RouterName } from "@/types/enums";
 import router from "@/router";
+
+const store = useStore();
+const isLogin = computed(() => store.getters["UserInfoStore/isLogin"]);
+const isAdmin = computed(() => store.getters["UserInfoStore/isAdmin"]);
+const userInfo = computed(() => store.getters["UserInfoStore/userInfo"]);
 
 const activeMenu = ref<string | null>(null); // 用於追蹤當前顯示的子菜單
 
@@ -73,14 +92,11 @@ const hideSubMenu = () => {
   activeMenu.value = null; // 隱藏子菜單
 };
 
-// const logout = () => {
-//   const userInfo = {} as UserInfo;
-//   emits("logout", userInfo);
-// };
-
-// onBeforeUpdate(() => {
-//   console.log("User Log out");
-// });
+const handleLogout = () => {
+  store.dispatch("UserInfoStore/logout").then(() => {
+    router.push({ name: RouterName.HOME });
+  });
+};
 </script>
 
 <style lang="scss" scoped>

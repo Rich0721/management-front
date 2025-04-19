@@ -4,6 +4,7 @@ import InputArea from "./input-area.vue";
 import ButtonComponent from "./button-component.vue";
 import ImageShow from "./image-show.vue";
 import EditComponent from "./edit-component.vue";
+import InputChoose from "./input-choose.vue";
 
 export {
   InputText,
@@ -12,4 +13,5 @@ export {
   ButtonComponent,
   ImageShow,
   EditComponent,
+  InputChoose,
 };

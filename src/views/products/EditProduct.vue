@@ -25,9 +25,16 @@
           :content="contentData.data.price"
           @update:model-value="(val) => (contentData.data.price = val)"
         />
-        <input-text
-          label="商品分類"
+        <input-choose
+          label="佛牌分級"
           :content="contentData.data.category"
+          :options="[
+            { label: '一級', value: 'First' },
+            { label: '二級', value: 'Sencond' },
+            { label: '三級', value: 'Third' },
+            { label: '四級', value: 'Fourth' },
+            { label: '五級', value: 'Fifth' },
+          ]"
           @update:model-value="(val) => (contentData.data.category = val)"
         />
         <input-area
@@ -74,11 +81,14 @@ import {
   ButtonComponent,
   ImageShow,
   EditComponent,
+  InputChoose,
 } from "@/components/Basics";
 import { Product } from "@/types/Product";
 import { EditEnum, RouterPath } from "@/types/enums";
 import { editSubmit, getProductById } from "@/services/EditProductService";
+import { userLogCheck } from "@/services/utils/userLogCheck";
 
+userLogCheck();
 const route = useRoute();
 const router = useRouter();
 const productId = route.params.id;

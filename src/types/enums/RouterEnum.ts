@@ -3,6 +3,7 @@ export enum RouterPath {
   EMPTY = "",
 
   /** Products */
+  SEALS = "/sales",
   PRODUCTS = "/products",
   EDIT_PRODUCT = "/products/:id",
   STOCK = "/products/stock",
@@ -15,6 +16,7 @@ export enum RouterName {
   EMPTY = "",
 
   /** Products */
+  SEALS = "sales",
   PRODUCTS = "products",
   EDIT_PRODUCT = "edit-product",
   STOCK = "stock",

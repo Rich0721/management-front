@@ -1,11 +1,8 @@
 export interface UserInfo {
-  userName?: string;
+  username?: string;
+  password?: string;
   userPermission?: UserPermission;
-}
-
-export interface AccountInfo {
-  account?: string;
-  password?: UserPermission;
+  clientId?: string;
 }
 
 export enum UserPermission {

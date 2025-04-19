@@ -8,18 +8,31 @@
 </template>
 
 <script setup lang="ts">
-import { defineEmits, ref } from "vue";
-import { UserPermission } from "@/types/userInfo";
+import { UserInfo } from "@/types/userInfo";
+import { ref } from "vue";
+import { useStore } from "vuex";
 
-const emits = defineEmits(["login"]);
+const store = useStore();
+
+// 定義帳號和密碼的雙向綁定
 const account = ref("");
 const password = ref("");
+
+// 登入方法
 const login = () => {
-  const userInfo = {
-    userName: account.value,
-    userPermission: UserPermission.ADMIN,
+  if (!account.value || !password.value) {
+    alert("請輸入帳號和密碼！");
+    return;
+  }
+
+  // 構造用戶信息
+  const userInfo: UserInfo = {
+    username: account.value,
+    password: password.value,
   };
-  emits("login", userInfo);
+
+  // 調用 Vuex 的 action
+  store.dispatch("UserInfoStore/setUserInfo", userInfo);
 };
 </script>
 

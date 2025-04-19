@@ -23,7 +23,9 @@ import { useRouter } from "vue-router";
 import { getProductList } from "@/services/EditProductService";
 import { Product, ShowProduct } from "@/types/Product";
 import { RouterPath } from "@/types/enums";
+import { userLogCheck } from "@/services/utils/userLogCheck";
 
+userLogCheck();
 const router = useRouter();
 const productList = ref<ShowProduct[]>([]);
 const fetchProducts = async () => {
